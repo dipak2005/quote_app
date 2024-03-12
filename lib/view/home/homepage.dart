@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
+import 'package:quote_app_af/controller/detailcontroller.dart';
 import 'package:quote_app_af/controller/homecontroller.dart';
 import 'package:quote_app_af/model/quotemodel.dart';
 import 'package:quote_app_af/model/util.dart';
 import 'package:quote_app_af/view/home/detailpage.dart';
 import 'package:quote_app_af/view/home/drawer.dart';
+import 'package:quote_app_af/view/theme/dark.dart';
+import 'package:quote_app_af/view/theme/light.dart';
 
 class HomePage extends StatelessWidget {
   final HomeController controller = Get.put(HomeController());
@@ -19,25 +22,37 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              controller.goOnline();
+            },
+            icon: Icon(
+              Icons.web_stories,
+              color: Colors.red,
+              size: 30,
+            )),
         title: Hero(
           tag: "app",
           child: Text(
-            "Quote App",
+            "Quotes",
             style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
           ),
         ),
         centerTitle: true,
         actions: [
-          Hero(
-            tag: "fav",
-            child: IconButton(
-              onPressed: () {
-                controller.goFav();
-              },
-              icon: Icon(
-                Icons.favorite,
-                color: Colors.red,
-              ),
+          IconButton(
+            onPressed: () {
+              if (Get.isDarkMode) {
+                Get.changeTheme(ThemeData.dark(useMaterial3: true));
+                print("ThemeMode.dark");
+              }
+              {
+                Get.changeTheme(ThemeData.light(useMaterial3: true));
+              }
+            },
+            icon: Icon(
+              (Get.isDarkMode) ? Icons.dark_mode_outlined : Icons.light,
+              color: Colors.black,
             ),
           ),
         ],
@@ -47,6 +62,10 @@ class HomePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: TextFormField(
+              onChanged: (value) {
+                controller.getSearch(value);
+                controller.showList();
+              },
               decoration: InputDecoration(
                 fillColor: Colors.black12,
                 filled: true,
@@ -78,16 +97,16 @@ class HomePage extends StatelessWidget {
           Expanded(
             child: Obx(
               () => ListView.builder(
-                itemCount: controller.quoteList.length,
+                itemCount: controller.findList.length,
                 itemBuilder: (context, index) {
-                  Quote quote = controller.quoteList[index];
-                  print("object $quote");
+                  Quote quote = controller.findList[index];
+
                   return Stack(
                     children: [
                       InkWell(
                         onTap: () {
-                          controller.goto(quote,index);
                           controller.tIndex.value = index;
+                          controller.goto(quote, controller.tIndex.value);
                         },
                         child: Container(
                           height: Get.height / 8,
@@ -105,8 +124,7 @@ class HomePage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child:
-                              Hero(tag: index,
-                              child: Image.asset("${quote.image}", fit: BoxFit.cover)),
+                              Image.asset(quote.image ?? "", fit: BoxFit.cover),
                         ),
                       ),
                       Positioned(
@@ -128,7 +146,7 @@ class HomePage extends StatelessWidget {
                           ),
                           child: Center(
                               child: Text(
-                            "${quote.type}",
+                            quote.type ?? "",
                             style: TextStyle(color: Colors.black),
                           )),
                         ),

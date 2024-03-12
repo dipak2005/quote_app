@@ -9,25 +9,33 @@ import 'package:quote_app_af/model/quotemodel.dart';
 class HomeController extends GetxController {
   bool isDark = false;
   RxList<Quote> quoteList = <Quote>[].obs;
-  RxList<Quote> favList = <Quote>[].obs;
+  RxList<Quote> findList = <Quote>[].obs;
   String fileData = "";
   RxInt tIndex = 0.obs;
+  RxBool isList = RxBool(true);
 
   @override
   void onInit() {
     super.onInit();
     getData();
+    getSearch(fileData);
   }
 
   Future<void> getData() async {
     fileData = await rootBundle.loadString("lib/data/quote.json");
 
     quoteList.value = quoteFromJson(fileData ?? "");
-    print("quoteList $quoteList");
+    // print("quoteList $quoteList");
   }
 
   void theme(bool value) {
     isDark = value;
+  }
+
+
+
+  void changeIndex(int index) {
+    tIndex.value = index;
   }
 
   void goto(Quote quote, int index) {
@@ -37,23 +45,31 @@ class HomeController extends GetxController {
     );
   }
 
-  void changeIndex(int index) {
-    tIndex = index.obs;
+  void showList() {
+    isList.value = false;
   }
+
+
 
   void goFav() {
     Get.toNamed("fav");
   }
 
-  void addFav(String quote) {
-    favList.add(Quote(quote: quoteList.value));
-    Get.showSnackbar(
-      GetSnackBar(
-        title: "Favorite",
-        backgroundColor: Color(0xff42C02B),
-        message: "Added Successfully",
-        duration: Duration(seconds: 3),
-      ),
-    );
+  void getSearch(String searchKey) {
+    RxList<Quote> result = <Quote>[].obs;
+    if (searchKey.isEmpty) {
+      result.value = quoteList;
+    } else {
+      result.value = quoteList
+          .where(
+              (p0) => p0.type!.toLowerCase().contains(searchKey.toLowerCase()))
+          .toList();
+    }
+
+    findList.value = result;
+  }
+
+  void goOnline() {
+    Get.toNamed("online");
   }
 }

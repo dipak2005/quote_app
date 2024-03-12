@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quote_app_af/controller/detailcontroller.dart';
 import 'package:quote_app_af/controller/homecontroller.dart';
+import 'package:quote_app_af/model/quotedata.dart';
 import 'package:quote_app_af/model/util.dart';
 
 import '../../model/quotemodel.dart';
@@ -39,16 +40,18 @@ class DetailPage extends StatelessWidget {
         centerTitle: true,
         actions: [
           Hero(
-            tag: 'search',
+            tag: "fav",
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                homeController.goFav();
+              },
               icon: Icon(
-                Icons.search,
-                color: Colors.black,
+                Icons.favorite,
+                color: Colors.red,
                 size: 30,
               ),
             ),
-          )
+          ),
         ],
       ),
       body: Column(
@@ -115,56 +118,77 @@ class DetailPage extends StatelessWidget {
             child: ListView.builder(
               itemCount: controller.list1?.quote?.length,
               itemBuilder: (context, index) {
-                var quote = controller.list1?.quote?[index];
-                return Obx(
-                  () => Container(
-                    height: Get.height / 6,
-                    width: Get.width,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0.9, 0.9),
-                            blurStyle: BlurStyle.outer)
-                      ],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    margin: EdgeInsets.all(10),
-                    clipBehavior: Clip.antiAlias,
-                    child: Stack(
-                      children: [
-                        Hero(
-                          tag: index,
-                          child: Image.asset(
-                              (controller.isShow.isTrue)
-                                  ? controller.quote?.image ?? ""
-                                  : controller.list1?.image ?? "",
-                              fit: BoxFit.cover),
-                        ),
-                        Center(
-                          child: Text(
-                            (controller.isShow.isTrue)
-                                ? controller.quote?.quote![index] ?? ""
-                                : quote,
-                            style: TextStyle(color: Colors.black),
+                String quote = controller.list1?.quote?[index];
+
+                if (quote.isNotEmpty) {
+                  return Obx(
+                    () => Container(
+                      height: Get.height / 6,
+                      width: Get.width,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: Offset(0.9, 0.9),
+                              blurStyle: BlurStyle.outer)
+                        ],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      margin: EdgeInsets.all(10),
+                      clipBehavior: Clip.antiAlias,
+                      child: Stack(
+                        children: [
+                          Hero(
+                            tag: index,
+                            child: Image.asset(
+                                (controller.isShow.isTrue)
+                                    ? controller.quote?.image ?? ""
+                                    : controller.list1?.image ?? "",
+                                fit: BoxFit.cover),
                           ),
-                        ),
-                        Positioned(
-                          right: 0,
-                          child: IconButton(
+                          Center(
+                            child: Text(
+                              (controller.isShow.isTrue)
+                                  ? controller.quote?.quote![index] ?? ""
+                                  : quote,
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                          Positioned(
+                            right: 0,
+                            child: IconButton(
                               onPressed: () {
-                                homeController.addFav((controller.isShow.isTrue)
-                                    ? controller.quote?.quote![index] ?? ""
-                                    : quote);
+                                controller.addInfo(QuoteData(
+                                    type: controller.list1?.type,
+                                    image: (controller.isShow.isTrue)
+                                        ? controller.quote?.image ?? ""
+                                        : controller.list1?.image ?? "",
+                                    quote: (controller.isShow.isTrue)
+                                        ? controller.quote?.quote![index] ?? ""
+                                        : quote));
                               },
-                              icon: Icon(Icons.favorite_border)),
-                        )
-                      ],
+                              icon: Icon(Icons.favorite_border),
+                            ),
+                          ),
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: IconButton(
+                              onPressed: () {
+                                // controller.deleteInfo();
+                              },
+                              icon: Icon(Icons.data_saver_on_rounded),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  return SizedBox.shrink();
+                }
               },
             ),
           ),

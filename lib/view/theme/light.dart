@@ -5,11 +5,11 @@ ThemeData light = ThemeData.light(useMaterial3: true).copyWith(
     textTheme: const TextTheme(
         bodyMedium: TextStyle(
           color: Colors.black,
-          fontSize: 35,
+          fontSize: 20,
           fontWeight: FontWeight.w700,
         ),
         displayMedium: TextStyle(
-            color: Colors.black, fontSize: 17, fontWeight: FontWeight.w500)),
+            color: Colors.black, fontSize: 12, fontWeight: FontWeight.w500)),
     tabBarTheme: const TabBarTheme(
       indicatorColor: Colors.white,
       indicatorSize: TabBarIndicatorSize.tab,
